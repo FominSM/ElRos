@@ -1,5 +1,4 @@
-/ElRos
 Django.pdf
-test.py
-test1.py
 /django_API
+__pycache__
+migrations
