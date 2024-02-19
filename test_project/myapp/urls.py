@@ -13,13 +13,15 @@ router.register(r'cars', CarViewSet)
 router.register(r'comments', CommentViewSet)
 
 
-# http://127.0.0.1:8000/api/export_to_xlsx/country/
-# http://127.0.0.1:8000/api/export_to_xlsx/manufacturer/
+# http://127.0.0.1:8000/api/export_to_xlsx/countries/
+# http://127.0.0.1:8000/api/export_to_xlsx/manufacturers/
+# http://127.0.0.1:8000/api/export_to_xlsx/cars/
+# http://127.0.0.1:8000/api/export_to_xlsx/comments/
 
 
 
 urlpatterns = [
     path('', index, name='index'),
     path('', include(router.urls)),
-    path('export_to_xlsx/<str:data_model>/', export_to_xlsx, name='export_all'),
+    path('export_to_xlsx/<str:data_model>/', export_to_xlsx, name='export_to_xlsx'),
 ]

@@ -12,39 +12,69 @@ def export_to_xlsx(request, data_model = None):
 
     wb = Workbook()
     ws = wb.active
+    line = 2
+
+    def __creating_an_empty_table(column_names, file):
+        '''
+        Функция принимает список названий столбцов - column_names и объект - file
+        типа Workbook(), создавая нужную пустую таблицу
+        '''
+
+        for col_num, header in enumerate(column_names, 1):
+                file.cell(row=1, column=col_num, value=header)
+        return ws
+    
+    def __filling_out_table_fields(data_arr):
+        '''
+        Функция принимает массив данных конкретного объекта - data_arr
+        и поколоночно записывает данные в цикле 
+        '''
+
+        for col_num in range(len(data_arr)):
+            ws.cell(row=line, column = col_num + 1, value = data_arr[col_num])
+        
     
     match data_model.lower():
-
-        case 'country':
-            output_file = 'output_country.xlsx'
-            line = 2
-            # Заголовки столбцов
-            headers = ['Страны']
-            # Добавление заголовков в таблицу
-            for col_num, header in enumerate(headers, 1):
-                ws.cell(row=1, column=col_num, value=header)
-            # Запись в файл
-            for country in Country.objects.all():
-                ws[f'A{line}'] = str(country)
+        case 'countries':
+            # задаем имя файла экспорта
+            output_file = 'countries.xlsx'
+            # генерируем пустую таблицу нужными названиями столбцов
+            ws = __creating_an_empty_table(['Страны'], ws)
+            # перебор обьектов модели и запись в файл
+            for country in Country.objects.all(): 
+                __filling_out_table_fields(str(country).split(' '))
                 line += 1
-            wb.save(output_file)
 
-        case 'manufacturer':
-            output_file = 'output_manufacturer.xlsx'
-            line = 2
-            # Заголовки столбцов
-            headers = ['Модель', 'Страна']
-            # Добавление заголовков в таблицу
-            for col_num, header in enumerate(headers, 1):
-                ws.cell(row=1, column=col_num, value=header)
+        case 'manufacturers':
+            output_file = 'manufacturers.xlsx'
+            ws = __creating_an_empty_table(['Модель', 'Страна'], ws)
+           
+            for manufacturer in  Manufacturer.objects.all(): 
+                __filling_out_table_fields(manufacturer._for_export().split('|'))
+                line += 1
 
-            for man in  Manufacturer.objects.all():
-                print(man, type(man))
+        case 'cars':
+            output_file = 'cars.xlsx'
+            ws = __creating_an_empty_table(['Автомобиль', 'Производитель', 'Страна', 'Год начала выпуска', 'Год окончания выпуска'], ws)
 
+            for car in  Car.objects.all():
+                print(type(car))
+                __filling_out_table_fields(car._for_export().split('|'))
+                line += 1
 
-            wb.save(output_file)
+        case 'comments':
+            output_file = 'comments.xlsx'
+            ws = __creating_an_empty_table(['e-mail', 'Дата комментария', 'Автомобиль', 'Комментарий'], ws)
 
+            for comment in  Comment.objects.all():
+                print(type(comment))
+                __filling_out_table_fields(comment._for_export().split('|'))
+                line += 1                       
+        case _:
+            return HttpResponse('<h1>Invalid request</h1>')
 
+    # сохраняем итоговый файл
+    wb.save(output_file)
     # Возвращение файла xlsx в ответе
     with open(output_file, 'rb') as f:
         response = HttpResponse(f.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
