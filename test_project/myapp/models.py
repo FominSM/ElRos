@@ -16,7 +16,7 @@ class Manufacturer(models.Model):
         return self.name
 
     def _for_export(self):
-        return f'{self.name} | {self.country}'
+        return f'{self.name}|{self.country}'
 
 class Car(models.Model):
     name = models.CharField(max_length=100)
@@ -28,7 +28,7 @@ class Car(models.Model):
         return self.name
     
     def _for_export(self):
-        return f'{self.name} | {self.manufacturer._for_export()} | {self.start_year} | {self.end_year}'
+        return f'{self.name}|{self.manufacturer._for_export()}|{self.start_year}|{self.end_year}'
 
 class Comment(models.Model):
     email = models.EmailField()
@@ -40,4 +40,4 @@ class Comment(models.Model):
         return f"{self.car.name} - {self.text[:20]}..."
     
     def _for_export(self):
-        return f"{self.email} | {self.created_at} | {self.car.name} | {self.text}"
+        return f"{self.email}|{self.created_at}|{self.car.name}|{self.text}"
