@@ -5,11 +5,13 @@ from django.http import HttpResponse
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from django.forms.models import model_to_dict
+import csv
+from django.http import HttpResponse
+from .models import Country, Manufacturer, Car, Comment
 
 
 
 def export_to_xlsx(request, data_model = None):
-
     wb = Workbook()
     ws = wb.active
     line = 2
@@ -35,7 +37,7 @@ def export_to_xlsx(request, data_model = None):
         
     
     match data_model.lower():
-        case 'countries':
+        case 'country':
             # задаем имя файла экспорта
             output_file = 'countries.xlsx'
             # генерируем пустую таблицу нужными названиями столбцов
@@ -45,7 +47,7 @@ def export_to_xlsx(request, data_model = None):
                 __filling_out_table_fields(str(country).split(' '))
                 line += 1
 
-        case 'manufacturers':
+        case 'manufacturer':
             output_file = 'manufacturers.xlsx'
             ws = __creating_an_empty_table(['Модель', 'Страна'], ws)
            
@@ -53,21 +55,19 @@ def export_to_xlsx(request, data_model = None):
                 __filling_out_table_fields(manufacturer._for_export().split('|'))
                 line += 1
 
-        case 'cars':
+        case 'car':
             output_file = 'cars.xlsx'
             ws = __creating_an_empty_table(['Автомобиль', 'Производитель', 'Страна', 'Год начала выпуска', 'Год окончания выпуска'], ws)
 
             for car in  Car.objects.all():
-                print(type(car))
                 __filling_out_table_fields(car._for_export().split('|'))
                 line += 1
 
-        case 'comments':
+        case 'comment':
             output_file = 'comments.xlsx'
             ws = __creating_an_empty_table(['e-mail', 'Дата комментария', 'Автомобиль', 'Комментарий'], ws)
 
             for comment in  Comment.objects.all():
-                print(type(comment))
                 __filling_out_table_fields(comment._for_export().split('|'))
                 line += 1                       
         case _:
@@ -78,6 +78,47 @@ def export_to_xlsx(request, data_model = None):
     # Возвращение файла xlsx в ответе
     with open(output_file, 'rb') as f:
         response = HttpResponse(f.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        # в последующем можно удалить 
-        response['Content-Disposition'] = 'attachment; filename="{0}".xlsx'.format(os.path.basename(output_file))
+        response['Content-Disposition'] = f'attachment; filename="{output_file}"'
         return response
+    
+
+
+def export_to_csv(request, data_model = None):
+    model_name = data_model.capitalize()
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{model_name}.csv"'
+    writer = csv.writer(response)
+
+    # словарь {название экспортируемого класса:{класс:[список названия столбцов]}}
+    model_dictionary_with_fields = {
+        'Country':
+            {Country: ['Страны']},
+        'Manufacturer':
+            {Manufacturer: ['Модель', 'Страна']},
+        'Car':
+            {Car: ['Автомобиль', 'Производитель', 'Страна', 'Год начала выпуска', 'Год окончания выпуска']},
+        'Comment':
+            {Comment: ['e-mail', 'Дата комментария', 'Автомобиль', 'Комментарий']}
+    }
+
+    # проверка наличия необходимой модели ы бд
+    if model_name in model_dictionary_with_fields.keys():
+        # получаем класс модели
+        model_d = list(model_dictionary_with_fields[model_name].keys())[0]
+        # получаем список - названия столбцов
+        column_names = model_dictionary_with_fields[model_name][model_d]
+
+        # Записываем названия столбцов
+        writer.writerow(column_names)
+        
+        if model_name == 'Country':
+            # Запись в файл
+            for item in model_d.objects.all():
+                writer.writerow([str(item)])
+        else:
+            # формирование списка атрибутов объекта и запись данных в файл
+            for item in model_d.objects.all():
+                writer.writerow([i for i in item._for_export().split('|')])            
+        return response
+    else:
+        return HttpResponse('<h1>Invalid request</h1>')
