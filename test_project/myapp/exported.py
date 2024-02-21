@@ -1,13 +1,7 @@
 from django.http import HttpResponse
 from .models import *
-import os
-from django.http import HttpResponse
 from openpyxl import Workbook
-from openpyxl.utils.dataframe import dataframe_to_rows
-from django.forms.models import model_to_dict
 import csv
-from django.http import HttpResponse
-from .models import Country, Manufacturer, Car, Comment
 
 
 
@@ -122,10 +116,3 @@ def export_to_csv(request, data_model = None):
         return response
     else:
         return HttpResponse('<h1>Invalid request</h1>')
-    
-
-def tests_f(request, id_n):
-    country_name = Country.objects.get(pk=id_n)
-    list_manuf = Manufacturer.objects.filter(country=id_n)
-    print(country_name, [val.name for val in list_manuf], sep='\n')
-    return HttpResponse(f'{country_name} - {[value.name for value in list_manuf]}')
