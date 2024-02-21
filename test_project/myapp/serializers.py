@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Country, Manufacturer, Car, Comment
+from .models import *
 
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
@@ -7,15 +7,18 @@ class CountrySerializer(serializers.ModelSerializer):
         # список отображаемых полей при GET-запросе
         fields = '__all__'
 
+
 class ManufacturerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Manufacturer
         fields = '__all__'
 
+
 class CarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Car
         fields = '__all__'
+
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,43 +26,45 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
 # - При запросе страны на стороне сериализатора добавить производителей в выдачу, которые ссылаются на нее.
-# - При запросе производителя добавлять страну, автомобили и количество комментариев к ним к выдаче.
-# - При запросе автомобиля добавить производителя и комментарии с их количеством в выдачу.
-# - При добавлении комментария проводить валидацию входных данных.
-
-
-
 class CountrySerializerV3(serializers.BaseSerializer):
     def to_representation(self, instance):
-        list_manuf = Manufacturer.objects.filter(country=instance.pk)
-        res = [val.name for val in list_manuf]
+        list_manufacturers = Manufacturer.objects.filter(country=instance.pk)
+        country_producers = [manufacturer.name for manufacturer in list_manufacturers]
 
         return {
             'country': instance.name,
-            'manufacturers': res
+            'manufacturers': country_producers
         }
 
+
+# - При запросе производителя добавлять страну, автомобили и количество комментариев к ним к выдаче.
 class ManufacturerSerializerV3(serializers.BaseSerializer):
     def to_representation(self, instance):
-        list_manuf = Manufacturer.objects.filter(country=instance.pk)
-        res = [val.name for val in list_manuf]
+        cars_list = Car.objects.filter(manufacturer=instance)
+        car_comments = {}
+        for car in cars_list:
+            comment_count = Comment.objects.filter(car=car).count()
+            car_comments[car.name] = f'{comment_count} comment(s)'
 
         return {
             'manufacturer': instance.name,
-            'manufacturer': res,
-            'cars': asdadd, 
-            'comments': asdasd
+            'country': str(instance.country),
+            'cars': car_comments
         }
 
 
-# def tests_f(request, id_n):
-#     country_name = Country.objects.get(pk=id_n)
-#     list_manuf = Manufacturer.objects.filter(country=id_n)
-#     print(country_name, [val.name for val in list_manuf], sep='\n')
-#     return HttpResponse(f'{country_name} - {[value.name for value in list_manuf]}')
+# - При запросе автомобиля добавить производителя и комментарии с их количеством в выдачу.
+class CarSerializerV3(serializers.BaseSerializer):
+    def to_representation(self, instance):
+        car_comments = Comment.objects.filter(car=instance)
+        comments_dict = {}
+        comments_dict['total comments'] = car_comments.count()
+        for comment in car_comments:
+            comments_dict[comment.email] = f'{comment.text}'
 
-
-
-
+        return {
+            'car': instance.name,
+            'manufacturer': str(instance.manufacturer),
+            'comments': comments_dict
+        }
