@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.http import HttpResponse
 from .models import *
 from openpyxl import Workbook
@@ -33,7 +34,7 @@ def export_to_xlsx(request, data_model = None):
     match data_model.lower():
         case 'country':
             # задаем имя файла экспорта
-            output_file = 'countries.xlsx'
+            output_file = 'countries'
             # генерируем пустую таблицу нужными названиями столбцов
             ws = __creating_an_empty_table(['Страны'], ws)
             # перебор обьектов модели и запись в файл
@@ -42,7 +43,7 @@ def export_to_xlsx(request, data_model = None):
                 line += 1
 
         case 'manufacturer':
-            output_file = 'manufacturers.xlsx'
+            output_file = 'manufacturers'
             ws = __creating_an_empty_table(['Модель', 'Страна'], ws)
            
             for manufacturer in  Manufacturer.objects.all(): 
@@ -50,7 +51,7 @@ def export_to_xlsx(request, data_model = None):
                 line += 1
 
         case 'car':
-            output_file = 'cars.xlsx'
+            output_file = 'cars'
             ws = __creating_an_empty_table(['Автомобиль', 'Производитель', 'Страна', 'Год начала выпуска', 'Год окончания выпуска'], ws)
 
             for car in  Car.objects.all():
@@ -58,7 +59,7 @@ def export_to_xlsx(request, data_model = None):
                 line += 1
 
         case 'comment':
-            output_file = 'comments.xlsx'
+            output_file = 'comments'
             ws = __creating_an_empty_table(['e-mail', 'Дата комментария', 'Автомобиль', 'Комментарий'], ws)
 
             for comment in  Comment.objects.all():
@@ -72,7 +73,7 @@ def export_to_xlsx(request, data_model = None):
     # Возвращение файла xlsx в ответе
     with open(output_file, 'rb') as f:
         response = HttpResponse(f.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        response['Content-Disposition'] = f'attachment; filename="{output_file}"'
+        response['Content-Disposition'] = f'attachment; filename="{output_file} {str(datetime.now().date())} {str(datetime.now().time())[:5]}.xlsx"'
         return response
     
 
@@ -80,7 +81,7 @@ def export_to_xlsx(request, data_model = None):
 def export_to_csv(request, data_model = None):
     model_name = data_model.capitalize()
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = f'attachment; filename="{model_name}.csv"'
+    response['Content-Disposition'] = f'attachment; filename="{model_name} {str(datetime.now().date())} {str(datetime.now().time())[:5]}.csv"'
     writer = csv.writer(response)
 
     # словарь {название экспортируемого класса:{класс:[список названия столбцов]}}
