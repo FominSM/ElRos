@@ -4,13 +4,13 @@ from .views import *
 from .exported import *
 
 # создание объекта-роутера
-router_api = DefaultRouter()
+router_api_v1 = DefaultRouter()
 
 # регистрация марщрутов для каждого представления в views.py
-router_api.register(r'country', CountryViewSet)
-router_api.register(r'manufacturer', ManufacturerViewSet)
-router_api.register(r'car', CarViewSet)
-router_api.register(r'comment', CommentViewSet)
+router_api_v1.register(r'country', CountryViewSet)
+router_api_v1.register(r'manufacturer', ManufacturerViewSet)
+router_api_v1.register(r'car', CarViewSet)
+router_api_v1.register(r'comment', CommentViewSet)
 
 
 '''
@@ -18,10 +18,10 @@ router_api.register(r'comment', CommentViewSet)
 пользовательский метод get_queryset, то набор представлений может не иметь атрибута .queryset. Если вы попытаетесь 
 зарегистрировать этот набор представлений, вы увидите ошибку
 '''
-router_api_v3 = DefaultRouter()
-router_api_v3.register(r'country', CountryViewSetV3, basename='Country')
-router_api_v3.register(r'manufacturer', ManufacturerViewSetV3, basename='Manufacturer')
-router_api_v3.register(r'car', CarViewSetV3, basename='Car')
+router_api_v2 = DefaultRouter()
+router_api_v2.register(r'country', CountryViewSetV3, basename='Country')
+router_api_v2.register(r'manufacturer', ManufacturerViewSetV3, basename='Manufacturer')
+router_api_v2.register(r'car', CarViewSetV3, basename='Car')
 
 
 '''
@@ -39,8 +39,8 @@ http://127.0.0.1:8000/api/export_to_csv/comment/
 '''
 
 urlpatterns = [
-    path('v1/', include(router_api.urls)),
-    path('v2/', include(router_api_v3.urls)),
+    path('v1/', include(router_api_v1.urls)),
+    path('v2/', include(router_api_v2.urls)),
     path('export_to_xlsx/<str:data_model>/', export_to_xlsx, name='export_to_xlsx'),
     path('export_to_csv/<str:data_model>/', export_to_csv, name='export_to_csv'),
 ]
