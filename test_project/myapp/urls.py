@@ -1,5 +1,5 @@
 from django.urls import include, path, re_path
-from rest_framework.routers import DefaultRouter, SimpleRouter
+from rest_framework.routers import DefaultRouter
 from .views import *
 from .exported import *
 
@@ -48,13 +48,3 @@ urlpatterns = [
     path('djoser/auth/', include('djoser.urls')),
     re_path(r'^auth/', include('djoser.urls.authtoken')),
 ]
-
-
-# create new user
-# http://127.0.0.1:8000/api/djoser/auth/users/ отправить POST запрос где Body - form data (username, password, email)
-
-# register new user
-# http://127.0.0.1:8000/api/auth/token/login/ отправить POST запрос где Body - form data (username, password) -> получим в ответе токен авторизации 
-
-# удаление токена пользователя-выход
-# http://127.0.0.1:8000/api/auth/token/logout/ отправить POST запрос где Headers - Authorization - Token 1234213123131313
