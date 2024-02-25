@@ -18,34 +18,31 @@
 
 2. Создать Endpoint’ы (/api/…) для:
     - Добавления, изменения, удаления и просмотра(GET, POST, PUT, DELETE) записей в моделях: 
-        - [«Страна»](https://github.com/FominSM/ElRos/blob/ffaca8732a6714cbbbb769fafbcf49d4d2a6fa1a/test_project/myapp/views.py#L11) - -  
+        - [«Страна»](https://github.com/FominSM/ElRos/blob/ffaca8732a6714cbbbb769fafbcf49d4d2a6fa1a/test_project/myapp/views.py#L11)  
         - [«Производитель»](https://github.com/FominSM/ElRos/blob/ffaca8732a6714cbbbb769fafbcf49d4d2a6fa1a/test_project/myapp/views.py#L22)
         - [«Автомобиль»](https://github.com/FominSM/ElRos/blob/ffaca8732a6714cbbbb769fafbcf49d4d2a6fa1a/test_project/myapp/views.py#L28) 
         - [«Комментарий»](https://github.com/FominSM/ElRos/blob/ffaca8732a6714cbbbb769fafbcf49d4d2a6fa1a/test_project/myapp/views.py#L43) 
-    - Экспорта данных в формате xlsx + csv в зависимости от передаваемого в запросе GET параметра.
+    - Экспорта данных в формате [xlsx](https://github.com/FominSM/ElRos/blob/650a425d62637a223061a3c4d4b90262bd0d9e54/test_project/myapp/exported.py#L9) + [csv](https://github.com/FominSM/ElRos/blob/650a425d62637a223061a3c4d4b90262bd0d9e54/test_project/myapp/exported.py#L81) в зависимости от передаваемого в запросе GET параметра.
 
 3. Настроить сериализаторы:
-    - При запросе страны на стороне сериализатора добавить производителей в выдачу, которые ссылаются на нее.
-    - При запросе производителя добавлять страну, автомобили и количество комментариев к ним к выдаче.
-    - При запросе автомобиля добавить производителя и комментарии с их количеством в выдачу.
-    - При добавлении комментария проводить валидацию входных данных.
+    - При запросе [страны](https://github.com/FominSM/ElRos/blob/650a425d62637a223061a3c4d4b90262bd0d9e54/test_project/myapp/serializers.py#L30) на стороне сериализатора добавить производителей в выдачу, которые ссылаются на нее.
+    - При запросе [производителя](https://github.com/FominSM/ElRos/blob/650a425d62637a223061a3c4d4b90262bd0d9e54/test_project/myapp/serializers.py#L42) добавлять страну, автомобили и количество комментариев к ним к выдаче.
+    - При запросе [автомобиля](https://github.com/FominSM/ElRos/blob/650a425d62637a223061a3c4d4b90262bd0d9e54/test_project/myapp/serializers.py#L58) добавить производителя и комментарии с их количеством в выдачу.
+    - При добавлении комментария [проводить валидацию](https://github.com/FominSM/ElRos/blob/650a425d62637a223061a3c4d4b90262bd0d9e54/test_project/myapp/serializers.py#L23) входных данных.
 
-4. Предоставить доступ к операциям:
-- добавления
-- редактирования
-- удаления 
-> страны, производителя и автомобиля только через передачу определенного токена. 
+4. Предоставить доступ к операциям: **добавления**, **редактирования**, **удаления** - *страны*, *производителя* и *автомобиля* только через передачу определенного токена. Доступ к **добавлению** и **просмотру** *комментария* оставить публичный, **редактирование** или **удаление** через токен.
 
-> Доступ к добавлению и просмотру комментария оставить публичный, редактирование или удаление через токен.
+> Доступ по токену реализован через библиотеку Djoser, ниже приведены команды для тестирования функционала черех Postman:
 
-# create new user
-# http://127.0.0.1:8000/api/djoser/auth/users/ отправить POST запрос где Body - form data (username, password, email)
+- create new user
+    > http://127.0.0.1:8000/api/djoser/auth/users/ отправить POST запрос где Body - form data (username, password, email)
 
-# register new user
-# http://127.0.0.1:8000/api/auth/token/login/ отправить POST запрос где Body - form data (username, password) -> получим в ответе токен авторизации 
+- register new user
+    > http://127.0.0.1:8000/api/auth/token/login/ отправить POST запрос где Body - form data (username, password) -> получим в ответе токен авторизации 
 
-# удаление токена пользователя-выход
-# http://127.0.0.1:8000/api/auth/token/logout/ отправить POST запрос где Headers - Authorization - Token 1234213123131313
+- deleting a token
+    > http://127.0.0.1:8000/api/auth/token/logout/ отправить POST запрос где Headers - Authorization - Token 1234213123131313
+
 
 ## Дополнительно, но не обязательно:
 - К проекту приложить файл с дампом запросов из ПО для тестирования (прим.: Postman)
