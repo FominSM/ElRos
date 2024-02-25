@@ -22,7 +22,7 @@
         - [«Производитель»](https://github.com/FominSM/ElRos/blob/ffaca8732a6714cbbbb769fafbcf49d4d2a6fa1a/test_project/myapp/views.py#L22)
         - [«Автомобиль»](https://github.com/FominSM/ElRos/blob/ffaca8732a6714cbbbb769fafbcf49d4d2a6fa1a/test_project/myapp/views.py#L28) 
         - [«Комментарий»](https://github.com/FominSM/ElRos/blob/ffaca8732a6714cbbbb769fafbcf49d4d2a6fa1a/test_project/myapp/views.py#L43) 
-    - Экспорта данных в формате [xlsx](https://github.com/FominSM/ElRos/blob/650a425d62637a223061a3c4d4b90262bd0d9e54/test_project/myapp/exported.py#L9) + [csv](https://github.com/FominSM/ElRos/blob/650a425d62637a223061a3c4d4b90262bd0d9e54/test_project/myapp/exported.py#L81) в зависимости от передаваемого в запросе GET параметра.
+    - Экспорта данных в формате [xlsx](https://github.com/FominSM/ElRos/blob/650a425d62637a223061a3c4d4b90262bd0d9e54/test_project/myapp/exported.py#L9) + [csv](https://github.com/FominSM/ElRos/blob/650a425d62637a223061a3c4d4b90262bd0d9e54/test_project/myapp/exported.py#L81) в зависимости от передаваемого в запросе GET параметра([маршруты для тестов](https://github.com/FominSM/ElRos/blob/2e07658532f8caffa32114e38a22b4b22249c130/test_project/myapp/urls.py#L27-L39)).
 
 3. Настроить сериализаторы:
     - При запросе [страны](https://github.com/FominSM/ElRos/blob/650a425d62637a223061a3c4d4b90262bd0d9e54/test_project/myapp/serializers.py#L30) на стороне сериализатора добавить производителей в выдачу, которые ссылаются на нее.
@@ -54,3 +54,10 @@
 
 ## При наличии знаний Docker:
 - Контейнеризировать Базу данных и приложение Django, адаптировать проект для развертывания через Docker-Compose.
+
+Порядок действий при наличии установленного и настроенного на ПК Docker:
+
+1. Сменить настройки БД в файле проекта - settings.py, [эти строки](https://github.com/FominSM/ElRos/blob/2e07658532f8caffa32114e38a22b4b22249c130/test_project/test_project/settings.py#L81-L90) - закомментировать, [а эти](https://github.com/FominSM/ElRos/blob/2e07658532f8caffa32114e38a22b4b22249c130/test_project/test_project/settings.py#L93-L102) - раскомментировать
+2. Файлы Docker - [Dockerfile](https://github.com/FominSM/ElRos/blob/main/test_project/Dockerfile) и .[yml](https://github.com/FominSM/ElRos/blob/main/test_project/docker-compose.yml)
+3. В cmd перейти в дирректорию проекта и выполнить команду - **docker-compose up**
+4. Произвести миграции, выполнив команду в терминале: **docker-compose run django python manage.py migrate**
