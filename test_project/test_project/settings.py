@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-g3$b420&m!owl#nm6=fdz_bu4l7l8yqdy5%_fp6m(!+4@-po9l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
 
 
 # Application definition
@@ -77,13 +77,7 @@ WSGI_APPLICATION = 'test_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
+# Настройки базы данных для работы на локальной машине
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -95,6 +89,17 @@ DATABASES = {
     }
 }
 
+# Настройки базы данных для работы через Docker
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',   # Используется PostgreSQL
+#         'NAME': 'postgres', # Имя базы данных
+#         'USER': 'postgres', # Имя пользователя
+#         'PASSWORD': 'postgres', # Пароль пользователя
+#         'HOST': 'pgdb', # Наименование контейнера для базы данных в Docker Compose
+#         'PORT': '5432',  # Порт базы данных
+#     }
+# }
 
 
 # Password validation
