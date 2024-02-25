@@ -16,8 +16,12 @@
     - Комментарий, с полями: «Email автора», «Автомобиль», «Дата создания», «Комментарий»
 
 
-2. Создать [Endpoint’ы (/api/…)](https://github.com/FominSM/ElRos/blob/main/test_project/myapp/views.py) для:
-    - Добавления, изменения, удаления и просмотра записей в моделях: [«Страна»](https://github.com/FominSM/ElRos/blob/ffaca8732a6714cbbbb769fafbcf49d4d2a6fa1a/test_project/myapp/views.py#L11), «Производитель», «Автомобиль», «Комментарий». (GET, POST, PUT, DELETE)
+2. Создать Endpoint’ы (/api/…) для:
+    - Добавления, изменения, удаления и просмотра(GET, POST, PUT, DELETE) записей в моделях: 
+        - [«Страна»](https://github.com/FominSM/ElRos/blob/ffaca8732a6714cbbbb769fafbcf49d4d2a6fa1a/test_project/myapp/views.py#L11) - -  
+        - [«Производитель»](https://github.com/FominSM/ElRos/blob/ffaca8732a6714cbbbb769fafbcf49d4d2a6fa1a/test_project/myapp/views.py#L22)
+        - [«Автомобиль»](https://github.com/FominSM/ElRos/blob/ffaca8732a6714cbbbb769fafbcf49d4d2a6fa1a/test_project/myapp/views.py#L28) 
+        - [«Комментарий»](https://github.com/FominSM/ElRos/blob/ffaca8732a6714cbbbb769fafbcf49d4d2a6fa1a/test_project/myapp/views.py#L43) 
     - Экспорта данных в формате xlsx + csv в зависимости от передаваемого в запросе GET параметра.
 
 3. Настроить сериализаторы:
