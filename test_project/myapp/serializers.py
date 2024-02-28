@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import *
+from .models import Country, Manufacturer, Car, Comment
 
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
