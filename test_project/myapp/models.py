@@ -1,12 +1,12 @@
 from django.db import models
 
-from django.db import models
 
 class Country(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
+
 
 class Manufacturer(models.Model):
     name = models.CharField(max_length=100)
@@ -15,8 +15,6 @@ class Manufacturer(models.Model):
     def __str__(self):
         return self.name
 
-    def _for_export(self):
-        return f'{self.name}|{self.country}'
 
 class Car(models.Model):
     name = models.CharField(max_length=100)
@@ -26,9 +24,7 @@ class Car(models.Model):
 
     def __str__(self):
         return self.name
-    
-    def _for_export(self):
-        return f'{self.name}|{self.manufacturer._for_export()}|{self.start_year}|{self.end_year}'
+
 
 class Comment(models.Model):
     email = models.EmailField()
@@ -38,6 +34,3 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"{self.car.name} - {self.text[:20]}..."
-    
-    def _for_export(self):
-        return f"{self.email}|{self.created_at}|{self.car.name}|{self.text}"
