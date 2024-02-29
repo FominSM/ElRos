@@ -5,25 +5,49 @@ from .models import Country, Manufacturer, Car, Comment
 from .serializers import *
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, BasePermission
 from rest_framework.authentication import TokenAuthentication
+from .exported import ExportDataToCsvOrXlsx
+from django.forms.models import model_to_dict
 
 
-# создание класса-представления на основе .ModelViewSet, что добавляет фун-л GET, POST, PUT, DEL
-class CountryViewSet(viewsets.ModelViewSet):
-    # создаем коллекцию всех обьектов модели
+class BaseCustomModelViewSet(viewsets.ModelViewSet):
+
+    def list(self, request, *args, **kwargs):
+        attr_to_export = ('id')
+
+        if 'get' in request.GET:
+            return ExportDataToCsvOrXlsx(request, self.queryset, self.attr_to_export, request.GET['get']).start(request)
+
+        return super(BaseCustomModelViewSet, self).list(request, *args, **kwargs) 
+  
+
+
+class CountryViewSet(BaseCustomModelViewSet):
     queryset = Country.objects.all()
-    # передаем данные в сериализатор
     serializer_class = CountrySerializer
-    # пользователь является аутентифицированным если имеет токен
-    authentication_classes = (TokenAuthentication, )
-    # разрешение на чтение всем, на действия с данными - если аутентифицирован
-    permission_classes = (IsAuthenticatedOrReadOnly, )
+    attr_to_export = ('id', 'name')
 
 
-class ManufacturerViewSet(viewsets.ModelViewSet):
+class ManufacturerViewSet(BaseCustomModelViewSet):
     queryset = Manufacturer.objects.all()
     serializer_class = ManufacturerSerializer
-    authentication_classes = (TokenAuthentication, )
-    permission_classes = (IsAuthenticatedOrReadOnly, )
+    attr_to_export = ('id', 'name', 'country')
+    
+
+
+# class CountryViewSet(viewsets.ModelViewSet):
+#     queryset = Country.objects.all()
+#     serializer_class = CountrySerializer
+#     authentication_classes = (TokenAuthentication, )
+#     permission_classes = (IsAuthenticatedOrReadOnly, )
+
+
+
+
+# class ManufacturerViewSet(viewsets.ModelViewSet):
+#     queryset = Manufacturer.objects.all()
+#     serializer_class = ManufacturerSerializer
+#     authentication_classes = (TokenAuthentication, )
+#     permission_classes = (IsAuthenticatedOrReadOnly, )
 
 class CarViewSet(viewsets.ModelViewSet):
     queryset = Car.objects.all()
