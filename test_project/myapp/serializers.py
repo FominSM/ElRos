@@ -1,10 +1,11 @@
 from rest_framework import serializers
 from .models import Country, Manufacturer, Car, Comment
 
+
+
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
-        # список отображаемых полей при GET-запросе
         fields = '__all__'
 
 
