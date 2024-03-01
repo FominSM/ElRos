@@ -61,3 +61,58 @@
 2. Файлы Docker - [Dockerfile](https://github.com/FominSM/ElRos/blob/main/test_project/Dockerfile) и .[yml](https://github.com/FominSM/ElRos/blob/main/test_project/docker-compose.yml)
 3. В cmd перейти в дирректорию проекта и выполнить команду - **docker-compose up**
 4. Произвести миграции, выполнив команду в терминале: **docker-compose run django python manage.py migrate**
+
+
+
+
+
+Для запуска проекта на Django и базы данных PostgreSQL с использованием Docker Compose и заданным собственным портом для базы данных PostgreSQL, вы можете создать следующий файл docker-compose.yml в корне вашего проекта:
+
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_HOST: db
+      PG_PORT: ${DB_PORT}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  backend:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+Замените DB_NAME, DB_USER, DB_PASSWORD и DB_PORT в файле docker-compose.yml на соответствующие значения из вашего файла .env.
+
+Также убедитесь, что у вас есть файл .env в корне вашего проекта, содержащий следующие переменные:
+
+DB_NAME=mydatabase
+DB_USER=myuser
+DB_PASSWORD=mypassword
+DB_PORT=5432
+
+Затем запустите Docker Compose:
+
+docker-compose up --build
+
+Теперь ваш проект на Django и база данных PostgreSQL запущены в Docker с помощью Docker Compose, и база данных PostgreSQL имеет заданный собственный порт.

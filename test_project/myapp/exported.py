@@ -32,8 +32,9 @@ class ExportDataToCsvOrXlsx():
 
         ws.append(self.attributs)
 
-        for data in self.queryset.values_list():
-            ws.append(data)
+        for instance in self.queryset:
+            instance_data = [str(getattr(instance, attr)) for attr in self.attributs]
+            ws.append(instance_data)
            
         output = io.BytesIO()
         wb.save(output)
@@ -43,7 +44,6 @@ class ExportDataToCsvOrXlsx():
             output.getvalue(),
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
-        # Задайте имя файла для скачивания
         response['Content-Disposition'] = f'attachment;\
         filename="{self.queryset.model._meta.model_name} {str(datetime.now().date())} {str(datetime.now().time())[:5]}.xlsx"'
 
@@ -58,15 +58,14 @@ class ExportDataToCsvOrXlsx():
 
         writer.writerow(self.attributs)
 
-        # for data in self.queryset.values_list():
-        #     writer.writerow(data)
-
-        #особое внимание
         for instance in self.queryset:
-            instance_data = [getattr(instance, attr) for attr in self.attributs]
+            instance_data = [str(getattr(instance, attr)) for attr in self.attributs]
             writer.writerow(instance_data)
 
         return response
+    
+    def name_generate(self, request):
+        pass
 
 
 
