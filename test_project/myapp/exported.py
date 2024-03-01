@@ -1,14 +1,16 @@
 from datetime import datetime
 from django.http import HttpResponse
-from .models import *
-from openpyxl import Workbook
-import csv
 from rest_framework.response import Response
-import io
+from openpyxl import Workbook
+import csv, io
 
 
 
 class ExportDataToCsvOrXlsx():
+    '''
+    Класс экспорта данных различных моделей в файл формата csv-xlsx 
+    в зависимости от переданного в GET-запросе параметра 
+    '''
     
     def __init__(self, request, queryset, attributs, data_format):
         self.queryset = queryset
@@ -16,17 +18,17 @@ class ExportDataToCsvOrXlsx():
         self.data_format = data_format
         self.request = request
 
-    def start(self, request):
+
+    def get_file(self):
         if self.data_format == 'csv':
             return self.export_to_csv(self.request)
-        
         elif self.data_format == 'xlsx':
              return self.export_to_xlsx(self.request)
         else:
             return Response({'Error':'An incorrect value for the "get" parameter was passed'}) 
-        
-    def export_to_xlsx(self, request):
 
+
+    def export_to_xlsx(self, request):
         wb = Workbook()
         ws = wb.active
 
@@ -40,21 +42,20 @@ class ExportDataToCsvOrXlsx():
         wb.save(output)
         output.seek(0)
 
-        response = HttpResponse(
+        self.response = HttpResponse(
             output.getvalue(),
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
-        response['Content-Disposition'] = f'attachment;\
-        filename="{self.queryset.model._meta.model_name} {str(datetime.now().date())} {str(datetime.now().time())[:5]}.xlsx"'
+        self.filename_generate(self.response, data_type='xlsx')
 
-        return response
+        return self.response
+
 
     def export_to_csv(self, request):
+        self.response = HttpResponse(content_type='text/csv')
+        self.filename_generate(self.response, data_type='csv')
 
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = f'attachment;\
-        filename="{self.queryset.model._meta.model_name} {str(datetime.now().date())} {str(datetime.now().time())[:5]}.csv"'
-        writer = csv.writer(response)
+        writer = csv.writer(self.response)
 
         writer.writerow(self.attributs)
 
@@ -62,133 +63,10 @@ class ExportDataToCsvOrXlsx():
             instance_data = [str(getattr(instance, attr)) for attr in self.attributs]
             writer.writerow(instance_data)
 
-        return response
-    
-    def name_generate(self, request):
-        pass
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# def export_to_xlsx(request, data_model = None):
-#     wb = Workbook()
-#     ws = wb.active
-#     line = 2
-
-#     def __creating_an_empty_table(column_names, file):
-#         '''
-#         Функция принимает список названий столбцов - column_names и объект - file
-#         типа Workbook(), создавая нужную пустую таблицу
-#         '''
-
-#         for col_num, header in enumerate(column_names, 1):
-#                 file.cell(row=1, column=col_num, value=header)
-#         return ws
-    
-#     def __filling_out_table_fields(data_arr):
-#         '''
-#         Функция принимает массив данных конкретного объекта - data_arr
-#         и поколоночно записывает данные в цикле 
-#         '''
-
-#         for col_num in range(len(data_arr)):
-#             ws.cell(row=line, column = col_num + 1, value = data_arr[col_num])
-        
-    
-#     match data_model.lower():
-#         case 'country':
-#             # задаем имя файла экспорта
-#             output_file = 'countries'
-#             # генерируем пустую таблицу нужными названиями столбцов
-#             ws = __creating_an_empty_table(['Страны'], ws)
-#             # перебор обьектов модели и запись в файл
-#             for country in Country.objects.all(): 
-#                 __filling_out_table_fields(str(country).split(' '))
-#                 line += 1
-
-#         case 'manufacturer':
-#             output_file = 'manufacturers'
-#             ws = __creating_an_empty_table(['Модель', 'Страна'], ws)
-           
-#             for manufacturer in  Manufacturer.objects.all(): 
-#                 __filling_out_table_fields(manufacturer._for_export().split('|'))
-#                 line += 1
-
-#         case 'car':
-#             output_file = 'cars'
-#             ws = __creating_an_empty_table(['Автомобиль', 'Производитель', 'Страна', 'Год начала выпуска', 'Год окончания выпуска'], ws)
-
-#             for car in  Car.objects.all():
-#                 __filling_out_table_fields(car._for_export().split('|'))
-#                 line += 1
-
-#         case 'comment':
-#             output_file = 'comments'
-#             ws = __creating_an_empty_table(['e-mail', 'Дата комментария', 'Автомобиль', 'Комментарий'], ws)
-
-#             for comment in  Comment.objects.all():
-#                 __filling_out_table_fields(comment._for_export().split('|'))
-#                 line += 1                       
-#         case _:
-#             return HttpResponse('<h1>Invalid request</h1>')
-
-#     # сохраняем итоговый файл
-#     wb.save(output_file)
-#     # Возвращение файла xlsx в ответе
-#     with open(output_file, 'rb') as f:
-        # response = HttpResponse(f.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        # response['Content-Disposition'] = f'attachment; filename="{output_file} {str(datetime.now().date())} {str(datetime.now().time())[:5]}.xlsx"'
-        # return response
+        return self.response
     
 
-
-# def export_to_csv(request, data_model = None):
-#     model_name = data_model.capitalize()
-#     response = HttpResponse(content_type='text/csv')
-#     response['Content-Disposition'] = f'attachment; filename="{model_name} {str(datetime.now().date())} {str(datetime.now().time())[:5]}.csv"'
-#     writer = csv.writer(response)
-
-#     # словарь {название экспортируемого класса:{класс:[список названия столбцов]}}
-#     model_dictionary_with_fields = {
-#         'Country':
-#             {Country: ['Страны']},
-#         'Manufacturer':
-#             {Manufacturer: ['Модель', 'Страна']},
-#         'Car':
-#             {Car: ['Автомобиль', 'Производитель', 'Страна', 'Год начала выпуска', 'Год окончания выпуска']},
-#         'Comment':
-#             {Comment: ['e-mail', 'Дата комментария', 'Автомобиль', 'Комментарий']}
-#     }
-
-#     # проверка наличия необходимой модели ы бд
-#     if model_name in model_dictionary_with_fields.keys():
-#         # получаем класс модели
-#         model_d = list(model_dictionary_with_fields[model_name].keys())[0]
-#         # получаем список - названия столбцов
-#         column_names = model_dictionary_with_fields[model_name][model_d]
-
-#         # Записываем названия столбцов
-#         writer.writerow(column_names)
-        
-#         if model_name == 'Country':
-#             # Запись в файл
-#             for item in model_d.objects.all():
-#                 writer.writerow([str(item)])
-#         else:
-#             # формирование списка атрибутов объекта и запись данных в файл
-#             for item in model_d.objects.all():
-#                 writer.writerow([i for i in item._for_export().split('|')])            
-#         return response
-#     else:
-#         return HttpResponse('<h1>Invalid request</h1>')
+    def filename_generate(self, response, data_type):
+        self.response['Content-Disposition'] = f'attachment;\
+        filename="{self.queryset.model._meta.model_name} {str(datetime.now().date())} {str(datetime.now().time())[:5]}.{data_type}"'
+    

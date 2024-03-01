@@ -28,8 +28,7 @@ router_api_v1.register(r'comment', CommentViewSet)
 urlpatterns = [
     path('v1/', include(router_api_v1.urls)),
     # path('v2/', include(router_api_v2.urls)),
-    # path('export_to_xlsx/<str:data_model>/', export_to_xlsx, name='export_to_xlsx'),
-    # path('export_to_csv/<str:data_model>/', export_to_csv, name='export_to_csv'),
+
 
     # Список актуальных пользователей доступен только через передачу токена
     path('djoser/auth/', include('djoser.urls')),
