@@ -20,12 +20,9 @@ class ExportDataToCsvOrXlsx():
 
 
     def get_file(self):
-        if self.data_format == 'csv':
-            return self.export_to_csv(self.request)
-        elif self.data_format == 'xlsx':
-             return self.export_to_xlsx(self.request)
-        else:
-            return Response({'Error':'An incorrect value for the "get" parameter was passed'}) 
+        if self.data_format == 'csv': return self.export_to_csv(self.request)
+        elif self.data_format == 'xlsx': return self.export_to_xlsx(self.request)
+        else: return Response({'Error':'An incorrect value for the "get" parameter was passed'}) 
 
 
     def export_to_xlsx(self, request):
