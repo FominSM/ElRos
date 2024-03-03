@@ -1,6 +1,7 @@
 from django.db import models
 
 
+
 class Country(models.Model):
     name = models.CharField(max_length=100)
 
@@ -10,7 +11,7 @@ class Country(models.Model):
 
 class Manufacturer(models.Model):
     name = models.CharField(max_length=100)
-    country = models.ForeignKey(Country, on_delete=models.CASCADE)
+    country = models.ForeignKey(Country, related_name='manufacturers', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
