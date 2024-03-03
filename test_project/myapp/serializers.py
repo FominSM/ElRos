@@ -3,15 +3,9 @@ from .models import Country, Manufacturer, Car, Comment
 
 
 
-class CountrySerializer(serializers.ModelSerializer):
+class CommentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Country
-        fields = '__all__'
-
-
-class ManufacturerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Manufacturer
+        model = Comment
         fields = '__all__'
 
 
@@ -20,27 +14,26 @@ class CarSerializer(serializers.ModelSerializer):
         model = Car
         fields = '__all__'
 
-
-class CommentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Comment
-        fields = '__all__'
-
-
-# - При запросе страны на стороне сериализатора добавить производителей в выдачу, которые ссылаются на нее.
-class CountrySerializerV3(serializers.BaseSerializer):
     def to_representation(self, instance):
-        list_manufacturers = Manufacturer.objects.filter(country=instance.pk)
-        country_producers = [manufacturer.name for manufacturer in list_manufacturers]
+        car_comments = Comment.objects.filter(car=instance)
+        comments_dict = {}
+        comments_dict['total comments'] = car_comments.count()
+        for comment in car_comments:
+            comments_dict[comment.email] = f'{comment.text}'
 
         return {
-            'country': instance.name,
-            'manufacturers': country_producers
+            'car': instance.name,
+            'manufacturer': str(instance.manufacturer),
+            'comments': comments_dict
         }
 
 
-# - При запросе производителя добавлять страну, автомобили и количество комментариев к ним к выдаче.
-class ManufacturerSerializerV3(serializers.BaseSerializer):
+class ManufacturerSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Manufacturer
+        fields = '__all__'
+
     def to_representation(self, instance):
         cars_list = Car.objects.filter(manufacturer=instance)
         car_comments = {}
@@ -55,17 +48,9 @@ class ManufacturerSerializerV3(serializers.BaseSerializer):
         }
 
 
-# - При запросе автомобиля добавить производителя и комментарии с их количеством в выдачу.
-class CarSerializerV3(serializers.BaseSerializer):
-    def to_representation(self, instance):
-        car_comments = Comment.objects.filter(car=instance)
-        comments_dict = {}
-        comments_dict['total comments'] = car_comments.count()
-        for comment in car_comments:
-            comments_dict[comment.email] = f'{comment.text}'
+class CountrySerializer(serializers.ModelSerializer):
+    manufacturers = ManufacturerSerializer(many=True, read_only=True)
 
-        return {
-            'car': instance.name,
-            'manufacturer': str(instance.manufacturer),
-            'comments': comments_dict
-        }
+    class Meta:
+        model = Country
+        fields = ('id', 'name', 'manufacturers')
