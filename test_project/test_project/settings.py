@@ -1,6 +1,7 @@
 from pathlib import Path
 
 
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-g3$b420&m!owl#nm6=fdz_bu4l7l8yqdy5%_fp6m(!+4@-po9l'
@@ -52,29 +53,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'test_project.wsgi.application'
 
-# Настройки базы данных для работы на локальной машине
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'app',
+        'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': 'admin',
-        'HOST': 'localhost',
-        'PORT': 1453,
+        'PASSWORD': 'postgres',
+        'HOST': 'pgdb',
+        'PORT': '5432',
     }
 }
-
-# Настройки базы данных для работы через Docker
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',   # Используется PostgreSQL
-#         'NAME': 'postgres', # Имя базы данных
-#         'USER': 'postgres', # Имя пользователя
-#         'PASSWORD': 'postgres', # Пароль пользователя
-#         'HOST': 'pgdb', # Наименование контейнера для базы данных в Docker Compose
-#         'PORT': '5432',  # Порт базы данных
-#     }
-# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -103,12 +91,12 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# REST_FRAMEWORK = {
-#     'DEFAULT_PERMISSION_CLASSES':[
-#         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-#     ],
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES':[
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
 
-#     'DEFAULT_AUTHENTICATION_CLASSES': (
-#         'rest_framework.authentication.TokenAuthentication',
-#     ),
-# }
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+}
